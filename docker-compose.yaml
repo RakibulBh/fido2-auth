@@ -10,6 +10,16 @@ services:
       - db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+  redis:
+    image: redis:8.0-rc1-alpine
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+    ports:
+      - "6379:6379"
 
 volumes:
+  redis_data:
+    driver: local
   db-data:
+    driver: local

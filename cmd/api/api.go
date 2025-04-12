@@ -9,13 +9,13 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/redis/go-redis/v9"
 )
-
-var webAuthn *webauthn.WebAuthn
 
 type application struct {
 	config          config
 	store           store.Storage
+	redis           *redis.Client
 	webAuthnService *webauthn.WebAuthn
 }
 
@@ -60,7 +60,8 @@ func (app *application) mount() http.Handler {
 	})
 
 	r.Route("/auth", func(r chi.Router) {
-		r.Post("/register", app.Register)
+		r.Post("/begin-register", app.BeginRegister)
+		r.Post("/complete-register", app.CompleteRegister)
 		r.Post("/login", app.Login)
 		r.Post("/logout", app.Logout)
 	})

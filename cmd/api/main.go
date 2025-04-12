@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	"github.com/RakibulBh/studygroup-backend/internal/db"
 	"github.com/RakibulBh/studygroup-backend/internal/env"
 	"github.com/RakibulBh/studygroup-backend/internal/store"
 	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -22,8 +24,8 @@ func main() {
 		},
 		webAuthn: &webauthn.Config{
 			RPDisplayName: "FIDO2-Demo",
-			RPID:          "github.com/RakibulBh/fido2-auth",
-			RPOrigins:     []string{"github.com/RakibulBh/fido2-auth"},
+			RPID:          "localhost",
+			RPOrigins:     []string{"http://localhost:5173"},
 		},
 	}
 
@@ -40,6 +42,17 @@ func main() {
 	}
 	defer db.Close()
 
+	// Init redis
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "",
+		DB:       0,
+		Protocol: 2,
+	})
+	if err := client.Ping(context.Background()).Err(); err != nil {
+		panic(err)
+	}
+
 	// Store
 	store := store.NewStorage(db)
 
@@ -47,6 +60,7 @@ func main() {
 		config:          cfg,
 		store:           store,
 		webAuthnService: webAuthn,
+		redis:           client,
 	}
 
 	mux := app.mount()
