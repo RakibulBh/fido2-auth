@@ -8,15 +8,18 @@ import (
 )
 
 type Storage struct {
-	Auth interface {
+	User interface {
 		CreateUser(ctx context.Context, user *User) error
-		StoreSessionData(ctx context.Context, userID string, sessionData *webauthn.SessionData) error
+		GetUserByID(ctx context.Context, ID string) (*User, error)
+	}
+	Auth interface {
 		StoreCredential(ctx context.Context, userID string, credential *webauthn.Credential) error
 	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
+		User: &UserStorage{db: db},
 		Auth: &AuthStorage{db: db},
 	}
 }
