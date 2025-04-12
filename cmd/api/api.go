@@ -54,12 +54,10 @@ func (app *application) mount() http.Handler {
 		r.Get("/", app.Healthcheck)
 	})
 
-	r.Route("/v1", func(r chi.Router) {
-		r.Route("/auth", func(r chi.Router) {
-			r.Post("/register", app.Register)
-			r.Post("/login", app.Login)
-			r.Post("/logout", app.Logout)
-		})
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/register", app.Register)
+		r.Post("/login", app.Login)
+		r.Post("/logout", app.Logout)
 	})
 
 	return r
