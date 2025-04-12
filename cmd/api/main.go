@@ -6,6 +6,7 @@ import (
 	"github.com/RakibulBh/studygroup-backend/internal/db"
 	"github.com/RakibulBh/studygroup-backend/internal/env"
 	"github.com/RakibulBh/studygroup-backend/internal/store"
+	"github.com/go-webauthn/webauthn/webauthn"
 )
 
 func main() {
@@ -19,6 +20,17 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 10),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "10s"),
 		},
+		webAuthn: &webauthn.Config{
+			RPDisplayName: "FIDO2-Demo",
+			RPID:          "github.com/RakibulBh/fido2-auth",
+			RPOrigins:     []string{"github.com/RakibulBh/fido2-auth"},
+		},
+	}
+
+	// WEBAUTHN
+	webAuthn, err := webauthn.New(cfg.webAuthn)
+	if err != nil {
+		panic(err)
 	}
 
 	// Database
@@ -32,8 +44,9 @@ func main() {
 	store := store.NewStorage(db)
 
 	app := &application{
-		config: cfg,
-		store:  store,
+		config:          cfg,
+		store:           store,
+		webAuthnService: webAuthn,
 	}
 
 	mux := app.mount()

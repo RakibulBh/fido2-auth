@@ -8,11 +8,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-webauthn/webauthn/webauthn"
 )
 
+var webAuthn *webauthn.WebAuthn
+
 type application struct {
-	config config
-	store  store.Storage
+	config          config
+	store           store.Storage
+	webAuthnService *webauthn.WebAuthn
 }
 
 type dbConfig struct {
@@ -23,10 +27,11 @@ type dbConfig struct {
 }
 
 type config struct {
-	addr   string
-	db     dbConfig
-	env    string
-	apiURL string
+	addr     string
+	db       dbConfig
+	env      string
+	apiURL   string
+	webAuthn *webauthn.Config
 }
 
 func (app *application) mount() http.Handler {

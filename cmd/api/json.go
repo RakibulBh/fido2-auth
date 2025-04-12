@@ -6,57 +6,64 @@ import (
 )
 
 type jsonResponse struct {
-	Error   bool        `json:"error"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
+	Error   bool   `json:"error"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
-func (app *application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers http.Header) error {
-	js, err := json.Marshal(data)
+func (app *application) writeJSON(w http.ResponseWriter, status int, message string, data any) error {
+	response := jsonResponse{
+		Error:   false,
+		Message: message,
+		Data:    data,
+	}
+
+	js, err := json.Marshal(response)
 	if err != nil {
 		return err
 	}
 
-	for k, v := range headers {
-		w.Header()[k] = v
-	}
-
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(js)
+
+	_, err = w.Write(js)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func (app *application) readJSON(w http.ResponseWriter, r *http.Request, dst interface{}) error {
+func (app *application) readJSON(r *http.Request, data any) error {
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 
-	return dec.Decode(dst)
-}
-
-func (app *application) errorJSON(w http.ResponseWriter, err error, status ...int) error {
-	statusCode := http.StatusBadRequest
-	if len(status) > 0 {
-		statusCode = status[0]
+	err := dec.Decode(data)
+	if err != nil {
+		return err
 	}
 
-	var payload jsonResponse
-	payload.Error = true
-	payload.Message = err.Error()
-
-	return app.writeJSON(w, statusCode, payload, nil)
+	return nil
 }
 
-func (app *application) errorResponse(w http.ResponseWriter, err error, status ...int) error {
-	statusCode := http.StatusBadRequest
-	if len(status) > 0 {
-		statusCode = status[0]
+func (app *application) errorJSON(w http.ResponseWriter, err error, statusCode int) error {
+	response := jsonResponse{
+		Error:   true,
+		Message: err.Error(),
 	}
 
-	var payload jsonResponse
-	payload.Error = true
-	payload.Message = err.Error()
+	js, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
 
-	return app.writeJSON(w, statusCode, payload, nil)
+	w.WriteHeader(statusCode)
+
+	_, err = w.Write(js)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
+	}
+
+	return nil
 }

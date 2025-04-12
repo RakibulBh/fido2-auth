@@ -1,14 +1,22 @@
 package store
 
-import "database/sql"
+import (
+	"context"
+	"database/sql"
+
+	"github.com/go-webauthn/webauthn/webauthn"
+)
 
 type Storage struct {
 	Auth interface {
+		CreateUser(ctx context.Context, user *User) error
+		StoreSessionData(ctx context.Context, userID string, sessionData *webauthn.SessionData) error
+		StoreCredential(ctx context.Context, userID string, credential *webauthn.Credential) error
 	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
-		Auth: &authStorage{db: db},
+		Auth: &AuthStorage{db: db},
 	}
 }
