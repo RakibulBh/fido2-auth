@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/RakibulBh/studygroup-backend/internal/db"
-	"github.com/RakibulBh/studygroup-backend/internal/env"
-	"github.com/RakibulBh/studygroup-backend/internal/store"
+	"github.com/RakibulBh/fido2-microservice/internal/db"
+	"github.com/RakibulBh/fido2-microservice/internal/env"
+	"github.com/RakibulBh/fido2-microservice/internal/store"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/redis/go-redis/v9"
 )

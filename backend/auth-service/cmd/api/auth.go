@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/RakibulBh/studygroup-backend/internal/store"
+	"github.com/RakibulBh/fido2-microservice/internal/store"
 	"github.com/go-redis/redis"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"

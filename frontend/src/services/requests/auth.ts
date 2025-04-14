@@ -75,8 +75,6 @@ export const registerUser = async ({ email }: { email: string }) => {
       sessionKey: data.data.sessionKey,
     };
 
-    console.log("Complete register payload:", JSON.stringify(payload, null, 2));
-
     const finishResponse = await fetch(
       `${import.meta.env.VITE_API_URL}/auth/complete-register`,
       {

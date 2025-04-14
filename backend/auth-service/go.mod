@@ -1,4 +1,4 @@
-module github.com/RakibulBh/studygroup-backend
+module github.com/RakibulBh/fido2-microservice
 
 go 1.24.0
 
