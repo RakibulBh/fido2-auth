@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -73,6 +73,8 @@ func (app *application) BeginRegister(w http.ResponseWriter, r *http.Request) {
 		SessionKey: sessionKey,
 	}
 
+	fmt.Print(optionsWithSession)
+
 	app.writeJSON(w, http.StatusOK, "registration successful", optionsWithSession)
 }
 
@@ -98,7 +100,6 @@ func (app *application) CompleteRegister(w http.ResponseWriter, r *http.Request)
 	}
 	r.Body.Close()
 	r.Body = io.NopCloser(bytes.NewReader(bodyBytes))
-	log.Printf("CompleteRegister request body: %s", string(bodyBytes))
 
 	// Parse payload for validation
 	var payload RegisterCompletePayload

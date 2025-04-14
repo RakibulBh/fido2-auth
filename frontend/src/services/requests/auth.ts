@@ -1,11 +1,11 @@
 import { toast } from "react-toastify";
 import { CredentialType } from "../../types";
 
-interface response {
-  data?: any;
-  message: string;
-  error: boolean;
-}
+// interface response {
+//   data?: any;
+//   message: string;
+//   error: boolean;
+// }
 
 interface registerResponse {
   data?: {
@@ -18,16 +18,20 @@ interface registerResponse {
 
 export const registerUser = async ({ email }: { email: string }) => {
   try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/auth/begin-register`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email }),
-      }
-    );
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/gateway`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service: "begin-register",
+        register_payload: {
+          email: email,
+        },
+      }),
+    });
 
     const data: registerResponse = await response.json();
+
+    console.log(data);
 
     if (data.error || !data.data?.options) {
       console.error("Registration error:", data.message);
@@ -76,11 +80,14 @@ export const registerUser = async ({ email }: { email: string }) => {
     };
 
     const finishResponse = await fetch(
-      `${import.meta.env.VITE_API_URL}/auth/complete-register`,
+      `${import.meta.env.VITE_API_URL}/gateway`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          service: "complete-register",
+          complete_register_payload: payload,
+        }),
       }
     );
 
