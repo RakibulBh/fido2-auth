@@ -61,7 +61,7 @@ func (app *application) mount() http.Handler {
 
 	r.Post("/begin-register", app.BeginRegister)
 	r.Post("/complete-register", app.CompleteRegister)
-	r.Post("/login", app.Login)
+	r.Post("/begin-login", app.BeginLogin)
 	r.Post("/logout", app.Logout)
 
 	return r

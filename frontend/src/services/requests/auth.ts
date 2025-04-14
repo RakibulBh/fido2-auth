@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { CredentialType } from "../../types";
+import { arrayBufferToBase64, base64ToArrayBuffer } from "../../lib/utils";
 
 // interface response {
 //   data?: any;
@@ -23,7 +24,7 @@ export const registerUser = async ({ email }: { email: string }) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         service: "begin-register",
-        register_payload: {
+        auth_payload: {
           email: email,
         },
       }),
@@ -106,31 +107,23 @@ export const registerUser = async ({ email }: { email: string }) => {
   }
 };
 
-function base64ToArrayBuffer(base64: string) {
-  const base64Standard = base64.replace(/-/g, "+").replace(/_/g, "/");
-  const paddedBase64 = base64Standard.padEnd(
-    base64Standard.length + ((4 - (base64Standard.length % 4)) % 4),
-    "="
-  );
+export const Login = async ({ email }: { email: string }) => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/gateway`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        service: "begin-login",
+        auth_payload: {
+          email: email,
+        },
+      }),
+    });
 
-  const binary = window.atob(paddedBase64);
-  const len = binary.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-  return bytes.buffer;
-}
+    const data = await response.json();
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = "";
-  const bytes = new Uint8Array(buffer);
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    console.log(data);
+  } catch (e) {
+    console.log(e);
   }
-  return window
-    .btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-}
+};

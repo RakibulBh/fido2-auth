@@ -15,11 +15,15 @@ type Storage struct {
 	Auth interface {
 		StoreCredential(ctx context.Context, userID string, credential *webauthn.Credential) error
 	}
+	Credentials interface {
+		GetCredentialsByEmail(ctx context.Context, email string) (*Credential, error)
+	}
 }
 
 func NewStorage(db *sql.DB) Storage {
 	return Storage{
-		User: &UserStorage{db: db},
-		Auth: &AuthStorage{db: db},
+		User:        &UserStorage{db: db},
+		Auth:        &AuthStorage{db: db},
+		Credentials: &CredentialsStorage{db: db},
 	}
 }

@@ -16,7 +16,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type RegisterPayload struct {
+type AuthPayload struct {
 	Email string `json:"email"`
 }
 
@@ -26,7 +26,7 @@ type OptionsWithSession struct {
 }
 
 func (app *application) BeginRegister(w http.ResponseWriter, r *http.Request) {
-	var payload RegisterPayload
+	var payload AuthPayload
 	err := app.readJSON(r, &payload)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusBadRequest)
@@ -156,7 +156,29 @@ func (app *application) CompleteRegister(w http.ResponseWriter, r *http.Request)
 	app.writeJSON(w, http.StatusCreated, "registration successful", nil)
 }
 
-func (app *application) Login(w http.ResponseWriter, r *http.Request) {
+func (app *application) BeginLogin(w http.ResponseWriter, r *http.Request) {
+	var payload AuthPayload
+	if err := app.readJSON(r, &payload); err != nil {
+		app.badRequestResponse(w, r, err)
+		return
+	}
+
+	if payload.Email == "" {
+		app.badRequestResponse(w, r, errors.New("email cannot be empty"))
+		return
+	}
+
+	ctx := r.Context()
+
+	credential, err := app.store.Credentials.GetCredentialsByEmail(ctx, payload.Email)
+	if err != nil {
+		fmt.Println(err)
+		app.internalServerErrorResponse(w, r, err)
+		return
+	}
+
+	fmt.Println(credential.PublicKey)
+
 	app.writeJSON(w, http.StatusOK, "Login", nil)
 }
 
